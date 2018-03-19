@@ -11,6 +11,10 @@
 #include <typeinfo>
 using namespace std; 
 
+#define t_cs 8
+int n;
+
+
 void parse(string a, vector<string> &id, vector<int> &arr_t, vector<int> &bur_t, vector<int> &num_bur, vector<int> &io_t){
 	int count = 0;
 	size_t i = 0;
@@ -74,7 +78,7 @@ void printv(vector<string> q){
 
 void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_bur, vector<int> io_t){
 	cout << "time 0ms: Simulator started for FCFS [Q <empty>]" <<  endl;
-	int end = id.size();
+	int end = n;
 	string current;
 	vector<string> q;
 	vector<int> s;
@@ -82,7 +86,8 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 	vector<int> io;
 	int count = -1;
 	bool process=false;
-	for (unsigned int i = 0; i<id.size(); ++i){
+
+	for (int i = 0; i<n; ++i){
 		io.push_back(-1);
 	}
 	while(1){
@@ -91,7 +96,7 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 			if (arr_t[i] == count){
 				q.push_back(id[i]);
 				s.push_back(i);
-				t.push_back(count+4);
+				t.push_back(count+t_cs/2);
 				cout<< "time " << count << "ms: Process " << id[i] << " arrived and added to ready queue [Q";
 				for (unsigned int j = 0; j < q.size(); ++j){
 					cout << " " << q[j];
@@ -117,14 +122,14 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 					cout<< "time " << count << "ms: Process " << current << " completed a CPU burst; " << num_bur[s[0]] <<  " bursts to go [Q";
 					printv(q);
 				}
-				t[s[0]] = count + io_t[s[0]]+4;
+				t[s[0]] = count + io_t[s[0]]+t_cs/2;
 				cout<< "time " << count << "ms: Process " << current << " switching out of CPU; will block on I/O until time " << t[s[0]] <<  "ms [Q";
 				printv(q);
 
 				io[s[0]] = t[s[0]];
 				s.erase(s.begin());
 				if(s.size() > 0){
-					t[s[0]] = count + 8;
+					t[s[0]] = count + t_cs;
 				}
 				process = false;
 			}
@@ -133,7 +138,7 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				printv(q);
 				s.erase(s.begin());
 				if(s.size() > 0){
-					t[s[0]] = count + 8;
+					t[s[0]] = count + t_cs;
 				}
 				process = false;
 				end -= 1;
@@ -152,14 +157,14 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				//t[s[0]] += 4;
 				printv(q);
 				if(q.size() == 1 && !process){
-					t[s[0]] += 4;
+					t[s[0]] += t_cs/2;
 				}
 				//cout << t[s[0]] << endl;
 				io[i] = -1;
 			}
 		}
 		if(end == 0){
-			cout << "time "<< count+4 <<"ms: Simulator ended for FCFS"<<endl;
+			cout << "time "<< count+t_cs/2 <<"ms: Simulator ended for FCFS"<<endl;
 			break;
 		}
 
@@ -185,12 +190,14 @@ int main(int argc, char* argv[]){
 	}
 
 	string a;
-	
+	//five vectors one for each column of the file
 	vector<string> id;
 	vector<int> arr_t;
 	vector<int> bur_t;
 	vector<int> num_bur;
 	vector<int> io_t;
+
+	//dictionary take id as key and other number from taht row as value
 	map<string, vector<int> > m;
 
 	while(in_str>>a){
@@ -200,6 +207,7 @@ int main(int argc, char* argv[]){
 			parse_m(a, m);
 		}
 	}
+	n = id.size();
 
 	/*
 	for(unsigned int i=0; i<id.size(); i++){
