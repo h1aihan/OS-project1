@@ -92,18 +92,6 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 	}
 	while(1){
 		count++;	
-		for(unsigned int i = 0; i<arr_t.size(); ++i){
-			if (arr_t[i] == count){
-				q.push_back(id[i]);
-				s.push_back(i);
-				t.push_back(count+t_cs/2);
-				cout<< "time " << count << "ms: Process " << id[i] << " arrived and added to ready queue [Q";
-				for (unsigned int j = 0; j < q.size(); ++j){
-					cout << " " << q[j];
-				}
-				cout << "]" << endl;
-			}
-		}
 		if(!process && !s.empty() && count == t[s[0]]){
 			process = true;
 			cout<< "time " << count << "ms: Process " << q[0] << " started using the CPU [Q";
@@ -151,7 +139,6 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 			if(count == io[i]){
 				q.push_back(id[i]);
 				s.push_back(i);
-
 				//cout << "io " << io[i] << " i " << i <<endl;
 				cout << "time " << count << "ms: Process " << id[i] << " completed I/O; added to ready queue [Q";
 				//t[s[0]] += 4;
@@ -161,6 +148,18 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				}
 				//cout << t[s[0]] << endl;
 				io[i] = -1;
+			}
+		}
+		for(unsigned int i = 0; i<arr_t.size(); ++i){
+			if (arr_t[i] == count){
+				q.push_back(id[i]);
+				s.push_back(i);
+				t.push_back(count+t_cs/2);
+				cout<< "time " << count << "ms: Process " << id[i] << " arrived and added to ready queue [Q";
+				for (unsigned int j = 0; j < q.size(); ++j){
+					cout << " " << q[j];
+				}
+				cout << "]" << endl;
 			}
 		}
 		if(end == 0){
