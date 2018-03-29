@@ -3,12 +3,13 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-#include <string>
 #include <iomanip>
 #include <map>
 #include <set>
 #include <functional>
 #include <typeinfo>
+#include <stdlib.h>
+#include <string>
 using namespace std; 
 
 #define t_cs 8
@@ -76,7 +77,7 @@ void printv(vector<string> q){
 	}
 }
 
-void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_bur, vector<int> io_t){
+void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_bur, vector<int> io_t, ofstream& outfile ){
 	cout << "time 0ms: Simulator started for FCFS [Q <empty>]" <<  endl;
 	int end = n;
 	string current;
@@ -84,8 +85,19 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 	vector<int> s;
 	vector<int> t;
 	vector<int> io;
+	vector<int> start_t;
+	vector<int> num_bur_copy;
+	vector<int> ave_turn;
+	float wait = 0;
+	int wait_t = 0;
 	int count = -1;
 	bool process=false;
+	int flag = 0;
+	int temp=0;
+
+	for(unsigned int i=0; i<num_bur.size(); i++){
+		num_bur_copy.push_back(num_bur[i]);
+	}
 
 	for (int i = 0; i<n; ++i){
 		io.push_back(-1);
@@ -95,25 +107,32 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 		if(!process && !s.empty() && count == t[s[0]]){
 			process = true;
 			cout<< "time " << count << "ms: Process " << q[0] << " started using the CPU [Q";
+			wait += count-start_t[s[0]]-t_cs/2;
+			wait_t+=1;
 			current = q[0];
 			q.erase(q.begin());
 			printv(q);
+			//cout << "count " << count << " start " << start_t[s[0]] << " now "<< wait_t << " w "<< wait << endl;
+
 		} 
 		if(process && count == bur_t[s[0]]+t[s[0]]){
-			if(num_bur[s[0]] > 1){
-				num_bur[s[0]] -= 1;
-				if(num_bur[s[0]] == 1){
-					cout<< "time " << count << "ms: Process " << current << " completed a CPU burst; " << num_bur[s[0]] <<  " burst to go [Q";
+			if(num_bur_copy[s[0]] > 1){
+				num_bur_copy[s[0]] -= 1;
+				if(num_bur_copy[s[0]] == 1){
+					cout<< "time " << count << "ms: Process " << current << " completed a CPU burst; " << num_bur_copy[s[0]] <<  " burst to go [Q";
 					printv(q);
 				}
 				else{
-					cout<< "time " << count << "ms: Process " << current << " completed a CPU burst; " << num_bur[s[0]] <<  " bursts to go [Q";
+					cout<< "time " << count << "ms: Process " << current << " completed a CPU burst; " << num_bur_copy[s[0]] <<  " bursts to go [Q";
 					printv(q);
 				}
 				t[s[0]] = count + io_t[s[0]]+t_cs/2;
 				cout<< "time " << count << "ms: Process " << current << " switching out of CPU; will block on I/O until time " << t[s[0]] <<  "ms [Q";
+				flag = 1;
+				temp = count;
+				ave_turn[s[0]] += count+t_cs/2;
 				printv(q);
-
+				//cout << "here2 " << t[s[0]] <<endl;
 				io[s[0]] = t[s[0]];
 				s.erase(s.begin());
 				if(s.size() > 0){
@@ -124,6 +143,7 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 			else{
 				cout<< "time " << count << "ms: Process " << current << " terminated [Q";
 				printv(q);
+				ave_turn[s[0]] += count+t_cs/2;
 				s.erase(s.begin());
 				if(s.size() > 0){
 					t[s[0]] = count + t_cs;
@@ -141,10 +161,17 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				s.push_back(i);
 				//cout << "io " << io[i] << " i " << i <<endl;
 				cout << "time " << count << "ms: Process " << id[i] << " completed I/O; added to ready queue [Q";
-				//t[s[0]] += 4;
+				start_t[i] = count;
+				ave_turn[i] -= count;
 				printv(q);
+				if(flag && count < temp+ 4){
+					t[s[0]] += 4;
+					flag=0;
+					//cout << "t " << t[s[0]] << endl;
+				}
 				if(q.size() == 1 && !process){
 					t[s[0]] += t_cs/2;
+					//cout << "here " << t[s[0]] <<endl;
 				}
 				//cout << t[s[0]] << endl;
 				io[i] = -1;
@@ -155,6 +182,8 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				q.push_back(id[i]);
 				s.push_back(i);
 				t.push_back(count+t_cs/2);
+				start_t.push_back(count);
+				ave_turn.push_back(count*(-1));
 				cout<< "time " << count << "ms: Process " << id[i] << " arrived and added to ready queue [Q";
 				for (unsigned int j = 0; j < q.size(); ++j){
 					cout << " " << q[j];
@@ -166,7 +195,6 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 			cout << "time "<< count+t_cs/2 <<"ms: Simulator ended for FCFS"<<endl;
 			break;
 		}
-
 		/*
 		if(!t.empty()){
 			cout << "t is ";
@@ -176,6 +204,31 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 			cout <<endl;
 		}*/
 	}
+	int switches = 0;
+	for(unsigned int i=0; i< num_bur.size(); ++i){
+		switches += num_bur[i];
+	}
+
+	float ave_b = 0.00;
+	for(unsigned int i=0; i< bur_t.size(); ++i){
+		ave_b += bur_t[i]*num_bur[i];
+	}
+	float ave_t = 0.00;
+	for(unsigned int i=0; i< ave_turn.size(); ++i){
+		ave_t += ave_turn[i];
+	}
+	ave_t = ave_t/switches;
+	ave_b = ave_b/switches;
+	wait = wait/wait_t;
+	outfile << "Algorithm FCFS\n";
+	outfile << "-- average CPU burst time: " << fixed << setprecision(2) << ave_b;
+	outfile << " ms" << endl;
+	outfile << "-- average wait time: " << fixed << setprecision(2) << wait;
+	outfile << " ms" << endl;
+	outfile << "-- average turnaround time: " << fixed << setprecision(2) << ave_t;
+	outfile << " ms" << endl;
+	outfile << "-- total number of context switches: " + to_string(switches) << endl;
+	outfile << "-- total number of preemptions: 0\n";
 
 }
 
@@ -208,6 +261,8 @@ int main(int argc, char* argv[]){
 	}
 	n = id.size();
 
+	ofstream out_str(argv[2]); 
+
 	/*
 	for(unsigned int i=0; i<id.size(); i++){
 		cout << id[i]<< " "<< arr_t[i] << " "<< bur_t[i] << " "<< num_bur[i] << " "<< io_t[i] << endl;
@@ -222,6 +277,6 @@ int main(int argc, char* argv[]){
 		cout << endl;
 	}*/
 
-	fcfs(id, arr_t, bur_t, num_bur, io_t);
+	fcfs(id, arr_t, bur_t, num_bur, io_t, out_str);
 
 }
