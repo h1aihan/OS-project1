@@ -15,7 +15,13 @@ using namespace std;
 
 #define t_cs 8
 int n;
-
+/****************************************************************************************
+****************************************************************************************
+utilities section ***************************************************************************
+****************************************************************************************
+****************************************************************************************
+**/
+// Commparequeue is a class for sorting piorityqueue in SRT
 class CompareQueue
 {
 public:
@@ -24,7 +30,7 @@ public:
     }
 };
 priority_queue<pair<string,int>, vector<pair<string,int> >,CompareQueue>  q;
-
+// file parser into vectors
 void parse(string a, vector<string> &id, vector<int> &arr_t, vector<int> &bur_t, vector<int> &num_bur, vector<int> &io_t){
 	int count = 0;
 	size_t i = 0;
@@ -50,7 +56,7 @@ void parse(string a, vector<string> &id, vector<int> &arr_t, vector<int> &bur_t,
 	//cout << a << endl;
 	io_t.push_back(atoi(a.c_str()));
 }
-
+//file parser into map
 void parse_m(string a, map<string, vector<int> > &m){
 	vector<int> v;
 	int count = 0;
@@ -59,7 +65,6 @@ void parse_m(string a, map<string, vector<int> > &m){
 	string key;
 	while((i = a.find("|")) != std::string::npos){
 		token = a.substr(0, i);
-		//cout << token << endl;
 		a.erase(0, i + 1);
 		count++;
 		if(count == 1){
@@ -69,11 +74,10 @@ void parse_m(string a, map<string, vector<int> > &m){
 			v.push_back(atoi(token.c_str()));
 		}
 	}
-	//cout << a << endl;
 	v.push_back(atoi(a.c_str()));
 	m.insert(make_pair(key,v));
 }
-
+//priorityqueue printer
 void print_pqueue(priority_queue<pair<string,int>,vector<pair<string,int> >,CompareQueue> q){
 	if(!q.empty()){
 		while (!q.empty())
@@ -87,7 +91,7 @@ void print_pqueue(priority_queue<pair<string,int>,vector<pair<string,int> >,Comp
 		cout << " <empty>]" << endl;;
 	}
 }
-
+//vector queue printer
 void printv(vector<string> q){
 	if(!q.empty()){
 		for (unsigned int j = 0; j < q.size(); ++j){
@@ -99,7 +103,13 @@ void printv(vector<string> q){
 		cout << " <empty>]" << endl;;
 	}
 }
-
+/****************************************************************************************
+****************************************************************************************
+simulation section ***************************************************************************
+****************************************************************************************
+****************************************************************************************
+**/
+//fcfs
 void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_bur, vector<int> io_t, ofstream& outfile ){
 	cout << "time 0ms: Simulator started for FCFS [Q <empty>]" <<  endl;
 	int end = n;
@@ -135,8 +145,6 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 			current = q[0];
 			q.erase(q.begin());
 			printv(q);
-			//cout << "count " << count << " start " << start_t[s[0]] << " now "<< wait_t << " w "<< wait << endl;
-
 		} 
 		if(process && count == bur_t[s[0]]+t[s[0]]){
 			if(num_bur_copy[s[0]] > 1){
@@ -155,7 +163,6 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				temp = count;
 				ave_turn[s[0]] += count+t_cs/2;
 				printv(q);
-				//cout << "here2 " << t[s[0]] <<endl;
 				io[s[0]] = t[s[0]];
 				s.erase(s.begin());
 				if(s.size() > 0){
@@ -173,16 +180,12 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				}
 				process = false;
 				end -= 1;
-				//cout <<  "s size " <<  s.size() << " q size "<< q.size() << endl;
-				
 			}
-			//cout << "s[0] "<< s[0] << " t " << t[s[0]] <<endl;
 		}
 		for(unsigned int i =0; i<io.size(); ++i){
 			if(count == io[i]){
 				q.push_back(id[i]);
 				s.push_back(i);
-				//cout << "io " << io[i] << " i " << i <<endl;
 				cout << "time " << count << "ms: Process " << id[i] << " completed I/O; added to ready queue [Q";
 				start_t[i] = count;
 				ave_turn[i] -= count;
@@ -190,13 +193,10 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 				if(flag && count < temp+ 4){
 					t[s[0]] += 4;
 					flag=0;
-					//cout << "t " << t[s[0]] << endl;
 				}
 				if(q.size() == 1 && !process){
 					t[s[0]] += t_cs/2;
-					//cout << "here " << t[s[0]] <<endl;
 				}
-				//cout << t[s[0]] << endl;
 				io[i] = -1;
 			}
 		}
@@ -218,14 +218,6 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 			cout << "time "<< count+t_cs/2 <<"ms: Simulator ended for FCFS"<<endl;
 			break;
 		}
-		/*
-		if(!t.empty()){
-			cout << "t is ";
-			for(unsigned int i =0; i<t.size(); ++i){
-				cout << t[i] << " ";
-			}
-			cout <<endl;
-		}*/
 	}
 	int switches = 0;
 	for(unsigned int i=0; i< num_bur.size(); ++i){
@@ -345,7 +337,6 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 				t[s] = t_cs/2;
 				cout<< "time " << count << "ms: Process " << current.first << " switching out of CPU; will block on I/O until time " << count + io_t[s]+ t[s] <<  "ms [Q";
 				print_pqueue(q);
-				//starts_wait[s] = count;
 				turnaround += count - ave_turn[s]+t_cs/2;
 				io[s] = count + io_t[s]+ t[s];
 				wait[s]=make_pair(current.first, bur_t[s]);
@@ -361,17 +352,14 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 				turnaround += count - ave_turn[s]+t_cs/2;
 				s=find(id.begin(),id.end(),current.first)-id.begin();
 				t[s]=t_cs/2;
-				//cout <<  "s " <<  s << " q size "<< q.size() << endl;	
 				wait[s] = current;
 				current=q.top();
-				s=find(id.begin(),id.end(),current.first)-id.begin();
-				//cout <<  "s size " <<  s<< " q size "<< q.size() << endl;	
+				s=find(id.begin(),id.end(),current.first)-id.begin();	
 				t[s]=t_cs/2;
 				process = false;
 				end -= 1;
 				
 			}
-			//cout << "s[0] "<< s[0] << " t " << t[s[0]] <<endl;
 		}
 		for(unsigned int i =0; i<io.size(); ++i){
 			if(count == io[i]){
@@ -458,11 +446,6 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 			outfile << " ms" << endl;
 			outfile << "-- total number of context switches: " + to_string(num_cs) << endl;
 			outfile << "-- total number of preemptions: " + to_string(num_pr) <<endl;
-			/*
-			cout << "number of context switch :"<< num_cs <<endl;
-			cout << "number of preemption :"<< num_pr <<endl;
-			cout << "average wait time: "<<avg_wt/(num_cs*1.0-num_pr)<<endl;
-			cout << "turn around " << turnaround/(num_cs*1.0-num_pr) <<endl;*/
 			break;
 		}
 
@@ -501,20 +484,6 @@ int main(int argc, char* argv[]){
 	n = id.size();
 
 	ofstream out_str(argv[2]); 
-
-	/*
-	for(unsigned int i=0; i<id.size(); i++){
-		cout << id[i]<< " "<< arr_t[i] << " "<< bur_t[i] << " "<< num_bur[i] << " "<< io_t[i] << endl;
-	}
-
-	map<string, vector<int> >::iterator it;
-	for(it = m.begin(); it != m.end(); ++it){
-		cout << it->first << " ";
-		for(unsigned int i=0; i<(it->second).size(); i++){
-			cout << (it->second)[i] << " ";
-		}
-		cout << endl;
-	}*/
 
 	fcfs(id, arr_t, bur_t, num_bur, io_t, out_str);
 	cout<<endl;
