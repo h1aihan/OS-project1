@@ -467,6 +467,11 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 					pair<string,int> temp=make_pair(id[i],bur_t[i]);
 					q.push(temp);
 					s=i;
+					for(unsigned int j=0; j<t.size(); ++j){
+						if(id[j]!= current.first &&(q.top().first==id[i])){
+							t[j]=0;
+						}
+					}
 					if (!process && (q.top().first==id[i])){
 						t[i]=t_cs/2;
 					}
@@ -570,7 +575,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 //--------------------------------------------------------------------
 
 		if ( !table.empty() && running.empty() ) {
-			unsigned int num_arr = 0;
+			int num_arr = 0;
 			// check table to see if there is incoming process at this time t
 			for (unsigned int i = 0; i < table.size(); i++) {
 				// there is a process arriving
@@ -586,7 +591,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
                 			+" arrived and added to ready queue " + queue_out;
 				}
 			}
-			for (unsigned int i = 0; i < num_arr; i++) {
+			for (int i = 0; i < num_arr; i++) {
 				table.erase(table.begin());
 			}
 		} // end if ( !table.empty() )
@@ -851,7 +856,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 //--------------------------------------------------------------------
 		// check second time
 		if ( !table.empty() ) {
-			unsigned int num_arr = 0;
+			int num_arr = 0;
 			// check table to see if there is incoming process at this time t
 			for (unsigned int i = 0; i < table.size(); i++) {
 				// there is a process arriving
@@ -867,7 +872,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
                 			+" arrived and added to ready queue " + queue_out;
 				}
 			}
-			for (unsigned int i = 0; i < num_arr; i++) {
+			for (int i = 0; i < num_arr; i++) {
 				table.erase(table.begin());
 			}
 		} // end if ( !table.empty() )
