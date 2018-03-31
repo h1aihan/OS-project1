@@ -145,7 +145,7 @@ void get_queue(vector<Process> ready_queue, string& queue_out) {
 
 	queue_out = "[Q ";
 	if( ready_queue.size()>0 ){
-		for (int i = 0; i < ready_queue.size(); ++i) {
+		for (unsigned int i = 0; i < ready_queue.size(); ++i) {
 			queue_out += ready_queue[i].id;
 			if (i != ready_queue.size()-1) {
 				queue_out += " ";
@@ -542,7 +542,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 	if (rr_add == "BEGINNING") queue_mode = 1;
 	else queue_mode = 0;
 
-	for (int i = 0; i < id.size(); i++) {
+	for (unsigned int i = 0; i < id.size(); i++) {
 		Process p;
 		p.setup(id[i], arr_t[i], bur_t[i], num_bur[i], io_t[i]);
 		table.push_back(p);
@@ -570,9 +570,9 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 //--------------------------------------------------------------------
 
 		if ( !table.empty() && running.empty() ) {
-			int num_arr = 0;
+			unsigned int num_arr = 0;
 			// check table to see if there is incoming process at this time t
-			for (int i = 0; i < table.size(); i++) {
+			for (unsigned int i = 0; i < table.size(); i++) {
 				// there is a process arriving
 				if (t == table[i].arr_t) {
 					num_arr++;
@@ -586,7 +586,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
                 			+" arrived and added to ready queue " + queue_out;
 				}
 			}
-			for (int i = 0; i < num_arr; i++) {
+			for (unsigned int i = 0; i < num_arr; i++) {
 				table.erase(table.begin());
 			}
 		} // end if ( !table.empty() )
@@ -655,7 +655,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 		if ( !blocked.empty() && running.empty()) {
 			vector<Process> finished;
 			// check if blocked process completed
-			for (int i = 0; i < blocked.size(); i++) {
+			for (unsigned int i = 0; i < blocked.size(); i++) {
 				if (t == blocked[i].block_t) { // block ends
 					finished.push_back(blocked[i]);
 					blocked[i].wait_t = t;
@@ -669,8 +669,8 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 				}
 			}
 			// take out from blocked
-			for (int i = 0; i < finished.size(); i++) {
-				for (int j = 0; j < blocked.size(); j++) {
+			for (unsigned int i = 0; i < finished.size(); i++) {
+				for (unsigned int j = 0; j < blocked.size(); j++) {
 					if (finished[i].id == blocked[j].id) {
 						blocked.erase(blocked.begin()+j);
 						break;
@@ -824,7 +824,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 		if ( !blocked.empty() ) {
 			vector<Process> finished;
 			// check if blocked process completed
-			for (int i = 0; i < blocked.size(); i++) {
+			for (unsigned int i = 0; i < blocked.size(); i++) {
 				if (t == blocked[i].block_t) { // block ends
 					finished.push_back(blocked[i]);
 					blocked[i].wait_t = t;
@@ -838,8 +838,8 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 				}
 			}
 			// take out from blocked
-			for (int i = 0; i < finished.size(); i++) {
-				for (int j = 0; j < blocked.size(); j++) {
+			for (unsigned int i = 0; i < finished.size(); i++) {
+				for (unsigned int j = 0; j < blocked.size(); j++) {
 					if (finished[i].id == blocked[j].id) {
 						blocked.erase(blocked.begin()+j);
 						break;
@@ -851,9 +851,9 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 //--------------------------------------------------------------------
 		// check second time
 		if ( !table.empty() ) {
-			int num_arr = 0;
+			unsigned int num_arr = 0;
 			// check table to see if there is incoming process at this time t
-			for (int i = 0; i < table.size(); i++) {
+			for (unsigned int i = 0; i < table.size(); i++) {
 				// there is a process arriving
 				if (t == table[i].arr_t) {
 					num_arr++;
@@ -867,7 +867,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
                 			+" arrived and added to ready queue " + queue_out;
 				}
 			}
-			for (int i = 0; i < num_arr; i++) {
+			for (unsigned int i = 0; i < num_arr; i++) {
 				table.erase(table.begin());
 			}
 		} // end if ( !table.empty() )
@@ -884,7 +884,7 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 
 	cout << "time " + to_string(t) + "ms: Simulator ended for RR" << endl;
 
-	for (int i = 0; i < table_calculation.size(); i++) {
+	for (unsigned int i = 0; i < table_calculation.size(); i++) {
 		total_burst_time += table_calculation[i].bur_t * table_calculation[i].num_bur;
 		total_num_burst += table_calculation[i].num_bur;
 		total_turnaround_time -= ( table_calculation[i].io_t * (table_calculation[i].num_bur-1) );
