@@ -104,6 +104,59 @@ void printv(vector<string> q){
 	}
 }
 
+// Round Robin Part Ultilities
+class Process
+{
+public:
+	Process(){
+		wait_t = 0;
+		preempts = 0;
+		block_t = 0;
+		status = 0;
+		/* status:
+		0: in the table
+		1: in the ready queue
+		2: in CPU
+		3: in I/0
+		4: in switch in
+		5: in switch out
+		6: terminated
+		*/
+	};
+
+	void setup(string name, int arrival, int burst, int burst_cnt, int io) {
+		id = name;
+		arr_t = arrival;
+		bur_t = burst;
+		num_bur = burst_cnt;
+		io_t = io;
+		burst_left = burst;
+	}
+
+	string id;
+	int arr_t,bur_t,num_bur,io_t;
+	int burst_left, wait_t;
+	int preempts, block_t;
+	int status;
+};
+
+void get_queue(vector<Process> ready_queue, string& queue_out) {
+
+	queue_out = "[Q ";
+	if( ready_queue.size()>0 ){
+		for (int i = 0; i < ready_queue.size(); ++i) {
+			queue_out += ready_queue[i].id;
+			if (i != ready_queue.size()-1) {
+				queue_out += " ";
+			}
+		}
+	}
+	else{
+		queue_out += "<empty>";
+	}
+	queue_out += "]\n";
+}
+
 
 /****************************************************************************************
 ****************************************************************************************
@@ -248,6 +301,7 @@ void fcfs(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> n
 	outfile << "-- total number of preemptions: 0\n";
 
 }
+
 
 void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_bur, vector<int> io_t, ofstream& outfile){
 	//simulation info output var
@@ -455,6 +509,8 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 	}
 
 }
+
+// ---------------------------------------------- Ricky Part Start -------------------------------------------------
 
 int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_bur, vector<int> io_t, string rr_add, ofstream& outfile) {
 	vector<Process> table;
@@ -701,8 +757,8 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 					else if (running[0].burst_left>0) { // still more time to go
 						running[0].status = 1; // in reay queue
 						running[0].wait_t = t;
-						if (queue_mode==1) ready_queue.insert(ready_queue.begin(),running[0]);
-						else ready_queue.push_back(running[0]);
+						// if (queue_mode==1) ready_queue.insert(ready_queue.begin(),running[0]);
+						ready_queue.push_back(running[0]);
 						running.erase(running.begin());
 					}
 					else { // reday to do I/O
@@ -848,15 +904,40 @@ int RR(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> num_
 	return EXIT_SUCCESS;
 }
 
+// ---------------------------------------------- Ricky Part End -------------------------------------------------
 
 
 int main(int argc, char* argv[]){
+
+	string rr_add = "END";
+
+	if (argc == 3) {
+		rr_add = "END";
+	}
+	else if (argc == 4) {
+		if (strcmp(argv[3], "BEGINNING") == 0) {
+			rr_add = argv[3];
+		} 
+		else if (strcmp(argv[3], "END") == 0) {
+			rr_add = argv[3];
+		}
+		else {
+			cerr << "The optional rr_add argument is wrong!" << endl;
+			return EXIT_FAILURE;
+		}
+	}
+	else {
+		cerr << "The number of arguments entered are wrong!" << endl;
+		return EXIT_FAILURE;
+	}
+
 	//read file
 	ifstream in_str(argv[1]);
 
 	if (!in_str.good()){
 		// check if the file can be read
 		cerr << "Can't open " << argv[1] << " to read.\n"; 
+		return EXIT_FAILURE;
 	}
 
 	string a;
@@ -884,4 +965,7 @@ int main(int argc, char* argv[]){
 	fcfs(id, arr_t, bur_t, num_bur, io_t, out_str);
 	cout<<endl;
 	srt(id, arr_t, bur_t, num_bur, io_t, out_str);
+
+	RR(id, arr_t, bur_t, num_bur, io_t, rr_add, out_str);
+
 }
