@@ -1,7 +1,9 @@
 /******************************************************
 CSCI 4210 Operating System Project1
 
-Author: Han Hai, Zhiqi Lin, Ziyi Song
+Author: Han Hai -- haih2 
+		Zhiqi Lin --linz6
+		Ziyi Song -- songz2
 
 Copyright 2018, All rights reserved
 
