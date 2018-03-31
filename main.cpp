@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <map>
 #include <set>
+#include <cstring>
 #include <functional>
 #include <typeinfo>
 #include <stdlib.h>
@@ -373,7 +374,12 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 				num_cs+=1;
 				process = true;
 				q.pop();
+				if (current.second!=bur_t[s]){
+					cout<< "time " << count << "ms: Process " << current.first << " started using the CPU with "<< current.second <<"ms remaining [Q";
+				}
+				else{
 				cout<< "time " << count << "ms: Process " << current.first << " started using the CPU [Q";
+				}
 				print_pqueue(q);
 
 			}	
@@ -437,7 +443,7 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 				{
 					num_pr+=1;
 					cout<< "time " << count <<"ms: Process "<< wait[i].first<<" completed I/O and will preempt "<< current.first <<
-					"[Q";
+					" [Q";
 					print_pqueue(q);
 					q.push(wait[i]);
 					q.push(current);
@@ -473,7 +479,7 @@ void srt(vector<string> id, vector<int> arr_t, vector<int> bur_t, vector<int> nu
 				{
 					num_pr+=1;
 					cout<<"time " << count <<"ms: Process " << id[i] << " arrived and will preempt " << current.first <<
-					 "[Q";
+					 " [Q";
 					 print_pqueue(q);
 					 s = find(id.begin(),id.end(),current.first)-id.begin();
 					 starts_wait[s]=count+t_cs/2;
