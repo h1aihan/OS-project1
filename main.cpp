@@ -1,3 +1,13 @@
+/******************************************************
+CSCI 4210 Operating System Project1
+
+Author: Han Hai, Zhiqi Lin, Ziyi Song
+
+Copyright 2018, All rights reserved
+
+*******************************************************/
+
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
